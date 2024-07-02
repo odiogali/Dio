@@ -12,3 +12,4 @@ Smart Review is a project that seeks to automate the process of deciding what to
 4. Specify the email you want the message to be received at
 5. You may also change the frequency you receive the review notes depending on how you use it
 6. Find a machine you can run the code in perpetuity on / AWS or some other cloud computing service
+**NOTE**: If the terminal is displaying errors involving the specified dependencies, you may need to run `go mod download <DEPENDENCY_NAME>` for github dependencies and `go get <DEPENDENCY_NAME>` for gopkg dependencies.

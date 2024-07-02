@@ -3,7 +3,6 @@ Smart Review is a project that seeks to automate the process of deciding what to
 - Deciding what note to review based on what you've reviewed in the current cycle
 - Formatting the notes such that they can be viewed as they are in your markdown editor
 - Sending the note as a formatted email so you get reminded to review and know what to review
-- A mechanism for testing yourself on the material you just reviewed
 
 # How to Use It
 1. Run this command in your terminal `git clone https://github.com/MisterBra1n/goSmartReview.git`

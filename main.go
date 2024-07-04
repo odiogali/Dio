@@ -19,6 +19,28 @@ var htstPathTo string = ""
 
 func main() {
 	for {
+		// add attachments
+		var imageDir string = "/home/odi/Sync/All/Customize/Excalidraw"
+		images := []string{}
+		err := filepath.Walk(imageDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				fmt.Println("Error adding attachments: ", err)
+				return err
+			}
+			if !info.IsDir() {
+				fmt.Println("File: ", path)
+				// if images were created/modified after a certain time, do...
+				if info.ModTime().After(time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)) {
+					images = append(images, path)
+				}
+			}
+			return nil
+		})
+			
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		from := ""
 		mailPass := ""
 		to := ""
@@ -48,6 +70,10 @@ func main() {
 
 		m.SetBody("text/html", messageAsString)
 
+		for _, item := range images {
+			m.Attach(item)
+		}
+		
 		d := gomail.NewDialer(smtpHost, 587, from, mailPass)
 
 		if err := d.DialAndSend(m); err != nil {

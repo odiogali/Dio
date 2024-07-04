@@ -20,7 +20,7 @@ var htstPathTo string = ""
 func main() {
 	for {
 		// add attachments
-		var imageDir string = "/home/odi/Sync/All/Customize/Excalidraw"
+		var imageDir string = ""
 		images := []string{}
 		err := filepath.Walk(imageDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {

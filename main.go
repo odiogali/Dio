@@ -6,7 +6,10 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 var cpscDir []string
@@ -17,30 +20,10 @@ var cpscPathTo string = ""
 var ssPathTo string = ""
 var htstPathTo string = ""
 
+var images []string
+
 func main() {
 	for {
-		// add attachments
-		var imageDir string = ""
-		images := []string{}
-		err := filepath.Walk(imageDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				fmt.Println("Error adding attachments: ", err)
-				return err
-			}
-			if !info.IsDir() {
-				fmt.Println("File: ", path)
-				// if images were created/modified after a certain time, do...
-				if info.ModTime().After(time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)) {
-					images = append(images, path)
-				}
-			}
-			return nil
-		})
-			
-		if err != nil {
-			fmt.Println(err)
-		}
-
 		from := ""
 		mailPass := ""
 		to := ""
@@ -65,15 +48,39 @@ func main() {
 			htstDir = repopulate(htstPathTo)
 		}
 
-		message := mdToHTML(smartSelect())
+		message, messageMD := mdToHTML(smartSelect())
+		images := extractPhotos(messageMD)
 		messageAsString := string(message)
 
 		m.SetBody("text/html", messageAsString)
 
-		for _, item := range images {
+		// add attachments
+		var imagePath []string
+		var imageDir string = ""
+		err := filepath.Walk(imageDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				fmt.Println("Error adding attachments: ", err)
+				return err
+			}
+			if !info.IsDir() {
+				// if images were created/modified after a certain time, do...
+				if slices.Contains(images, info.Name()) {
+					imagePath = append(imagePath, path)
+				}
+			}
+			return nil
+		})
+
+		fmt.Println("Paths to the images: ", imagePath)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for _, item := range imagePath {
 			m.Attach(item)
 		}
-		
+
 		d := gomail.NewDialer(smtpHost, 587, from, mailPass)
 
 		if err := d.DialAndSend(m); err != nil {
@@ -112,6 +119,7 @@ func repopulate(dir string) []string {
 func smartSelect() []string {
 	result := []string{} // store 3 random filepaths in here
 
+	// This should never happen because smartSelect is always called after potential repopulates
 	if len(cpscDir) == 0 || len(ssDir) == 0 || len(htstDir) == 0 {
 		fmt.Println("CPSC: ", len(cpscDir), " SS: ", len(ssDir), " HTST: ", len(htstDir))
 		return result
@@ -125,7 +133,7 @@ func smartSelect() []string {
 	result = append(result, chooseFile(ssPathTo, ssRand))
 	result = append(result, chooseFile(htstPathTo, htstRand))
 
-	fmt.Println(result)
+	fmt.Println("Chosen files: ", result)
 
 	return result
 }
@@ -153,4 +161,57 @@ func chooseFile(direcName string, randInt int) string {
 	}
 
 	return result
+}
+
+func extractPhotos(original []byte) []string {
+	var images []string
+
+	var excalamationRune bool = false
+	var leftSquareRune bool = false
+	var rightSquareRune bool = false
+	var leftParenRune bool = false
+	var rightParenRune bool = false
+	var consecCount int = 0
+
+	var toWrite strings.Builder
+
+	// 33 is ! ; 91 is [
+	for len(original) > 0 {
+		rune, size := utf8.DecodeRune(original)
+
+		// CHARACTERS HAVE TO BE IN SUCCESSION somewhat
+		if !excalamationRune && !leftSquareRune && !rightSquareRune && !leftParenRune && rune == 33 {
+			excalamationRune = true
+			consecCount++
+		} else if excalamationRune && !leftSquareRune && !rightSquareRune && !leftParenRune && rune == 91 && consecCount == 1 {
+			leftSquareRune = true
+			consecCount++
+		} else if excalamationRune && leftSquareRune && !rightSquareRune && !leftParenRune && rune == 93 && consecCount == 2 {
+			rightSquareRune = true
+			consecCount++
+		} else if excalamationRune && leftSquareRune && rightSquareRune && !leftParenRune && rune == 40 && consecCount == 3 {
+			leftParenRune = true
+			consecCount++
+		} else if excalamationRune && leftSquareRune && rightSquareRune && leftParenRune && !rightParenRune && rune != 41 {
+			if rune != 60 && rune != 62 {
+				toWrite.WriteRune(rune)
+			}
+		} else if excalamationRune && leftSquareRune && rightSquareRune && leftParenRune && !rightParenRune && rune == 41 {
+			rightParenRune = true
+			image := toWrite.String()
+			images = append(images, image)
+			toWrite.Reset()
+
+			excalamationRune = false
+			leftSquareRune = false
+			rightSquareRune = false
+			leftParenRune = false
+			rightParenRune = false
+			consecCount = 0
+		}
+
+		original = original[size:]
+	}
+
+	return images
 }

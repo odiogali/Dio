@@ -1,4 +1,4 @@
-# Smart Review (Written in Go)
+# Smart Review
 Smart Review is a project that seeks to automate the process of deciding what to review. It deals with:
 - Deciding what note to review based on what you've reviewed in the current cycle
 - Formatting the notes such that they can be viewed as they are in your markdown editor

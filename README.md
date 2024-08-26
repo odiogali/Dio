@@ -5,7 +5,7 @@ Smart Review is a project that seeks to automate the process of deciding what to
 - Sending the note as a formatted email so you get reminded to review and know what to review
 
 # How to Use It
-1. Run this command in your terminal `git clone https://github.com/MisterBra1n/goSmartReview.git`
+1. Run this command in your terminal `git clone https://github.com/odiogali/goSmartReviewer.git`
 2. Start by specifying the three subjects you would like to review by replacing the paths to their directories
 3. Specify the email you want the message to be sent from and the password denoted by 'mailPass'
 4. Specify the email you want the message to be received at

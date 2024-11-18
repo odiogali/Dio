@@ -10,7 +10,7 @@ import (
 	"fmt"
 )
 
-func mdToHTML(files []string) ([]byte, []byte) {
+func mdToHTML(files []string) []byte {
 	// read and store markdown file in 'mdContent'
 	var contents []byte
 	for i := range files {
@@ -32,5 +32,5 @@ func mdToHTML(files []string) ([]byte, []byte) {
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
 
-	return markdown.Render(doc, renderer), contents
+	return markdown.Render(doc, renderer)
 }

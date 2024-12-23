@@ -2,16 +2,25 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	gomail "gopkg.in/mail.v2"
+	"io"
 	"math/rand"
+	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
-func main() {
-	dirMap := make(map[string][]string) // Maps directory name to names of files that haven't been chosen
+var (
+	dirMap             = make(map[string][]string) // Maps directory name to names of files that haven't been chosen
+	webContent  string = ""
+	contentLock sync.RWMutex
+)
 
+func main() {
+	// Command-line argument error handling
 	if len(os.Args) == 1 {
 		fmt.Println("Must include at least one directory path to choose from.")
 		os.Exit(1)
@@ -22,41 +31,61 @@ func main() {
 		dirMap[s] = []string{}
 	}
 
-	for {
-		from := ""
-		mailPass := ""
-		to := ""
-		smtpHost := "smtp.gmail.com"
+	// Concurrent goroutine for updating webpage dynamically
+	go func() {
+		ticker := time.NewTicker(15 * time.Second)
+		defer ticker.Stop()
 
-		m := gomail.NewMessage()
-
-		m.SetHeader("From", from)
-		m.SetHeader("To", to)
-		m.SetHeader("Subject", "Review Notes")
-
-		// If any of the arrays are empty, then repopulate them and begin a new cycle
-		for dirName, dirList := range dirMap {
-			if len(dirList) == 0 {
-				dirMap[dirName] = repopulate(dirName)
-			}
+		updateContent()
+		for range ticker.C {
+			fmt.Println("Selecting new files...")
+			updateContent()
 		}
+	}()
 
-		message := mdToHTML(smartSelect(dirMap))
-		messageAsString := string(message)
+	mux := http.NewServeMux()
 
-		m.SetBody("text/html", messageAsString)
-
-		d := gomail.NewDialer(smtpHost, 587, from, mailPass)
-
-		if err := d.DialAndSend(m); err != nil {
-			fmt.Println(err)
-			panic(err)
-		}
-
-		fmt.Println("Email sent successfully!")
-
-		time.Sleep(24 * time.Hour)
+	// Handle requests to get the root
+	var getRoot = func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Got / request")
+		contentLock.RLock()
+		w.Header().Set("Content-Type", "text/html")
+		io.WriteString(w, webContent)
+		contentLock.RUnlock()
 	}
+
+	mux.HandleFunc("/", getRoot)
+
+	server := &http.Server{
+		Addr:    ":3333",
+		Handler: mux,
+	}
+
+	// Start the server in separate goroutine
+	fmt.Println("Server is running on http://localhost:3333")
+	if err := server.ListenAndServe(); err != nil {
+		fmt.Printf("Server error: %s\n", err)
+		os.Exit(1)
+	}
+
+}
+
+func updateContent() {
+	// If any of the arrays are empty, then repopulate them and begin a new cycle
+	for dirName, dirList := range dirMap {
+		if len(dirList) == 0 {
+			fmt.Printf("Repopulating %s...\n", dirName)
+			dirMap[dirName] = repopulate(dirName)
+		}
+	}
+
+	message := mdToHTML(smartSelect(dirMap))
+
+	contentLock.Lock()
+	webContent = string(message)
+
+	//sendEmail(string(message))
+	contentLock.Unlock()
 }
 
 func repopulate(dir string) []string { // Fills and returns slice containing all files in directory specified
@@ -126,4 +155,34 @@ func chooseFile(direcName string, randInt int) string {
 	}
 
 	return result
+}
+
+func sendEmail(message string) {
+	err := godotenv.Load(".gitignore/.env")
+
+	if err != nil {
+		fmt.Println("Error loading .env file.")
+		os.Exit(1)
+	}
+
+	from := os.Getenv("FROM")
+	mailPass := os.Getenv("PASSWORD")
+	to := os.Getenv("TO")
+	smtpHost := "smtp.gmail.com"
+
+	m := gomail.NewMessage()
+
+	m.SetHeader("From", from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", "Review Notes")
+
+	m.SetBody("text/html", message)
+
+	d := gomail.NewDialer(smtpHost, 587, from, mailPass)
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Email sent successfully!")
 }

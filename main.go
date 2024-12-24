@@ -21,10 +21,12 @@ var (
 
 func main() {
 	// Command-line argument error handling
-	if len(os.Args) == 1 {
+	if len(os.Args) <= 2 {
 		fmt.Println("Must include at least one directory path to choose from.")
 		os.Exit(1)
 	}
+
+	fmt.Printf("Your arguments: %s\n\n", os.Args[1:])
 
 	// Add the specified directories into the map with empty lists as their values
 	for _, s := range os.Args[1:] {
@@ -61,13 +63,11 @@ func main() {
 		Handler: mux,
 	}
 
-	// Start the server in separate goroutine
 	fmt.Println("Server is running on http://localhost:3333")
 	if err := server.ListenAndServe(); err != nil {
 		fmt.Printf("Server error: %s\n", err)
 		os.Exit(1)
 	}
-
 }
 
 func updateContent() {
@@ -133,6 +133,7 @@ func smartSelect(dirMap map[string][]string) []string {
 
 		// If the totalSize of the files we wish to add is larger than 20 kB, don't add the additional file
 		if len(result) > 1 && totalSize > 20480 {
+			totalSize -= info.Size()
 			break
 		}
 

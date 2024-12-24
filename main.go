@@ -74,7 +74,7 @@ func updateContent() {
 	// If any of the arrays are empty, then repopulate them and begin a new cycle
 	for dirName, dirList := range dirMap {
 		if len(dirList) == 0 {
-			fmt.Printf("Repopulating %s...\n", dirName)
+			fmt.Printf("Repopulating %s...\n\n", dirName)
 			dirMap[dirName] = repopulate(dirName)
 		}
 	}
@@ -111,6 +111,7 @@ func repopulate(dir string) []string { // Fills and returns slice containing all
 
 func smartSelect(dirMap map[string][]string) []string {
 	result := []string{} // store n random filepaths in here (n = # specified in command line args)
+	var totalSize int64 = 0
 
 	for dirName, dirList := range dirMap {
 		if len(dirList) == 0 {
@@ -120,14 +121,29 @@ func smartSelect(dirMap map[string][]string) []string {
 		}
 
 		randNum := rand.Intn(len(dirList)) // Generate random number between 0 and num of files
-		result = append(result, chooseFile(dirName, randNum))
+		chosen := chooseFile(dirName, randNum)
+
+		info, err := os.Stat(chosen)
+		if err != nil {
+			fmt.Printf("Problem obtaining the file info of the file: %s\n", chosen)
+			continue
+		}
+
+		totalSize += info.Size()
+
+		// If the totalSize of the files we wish to add is larger than 20 kB, don't add the additional file
+		if len(result) > 1 && totalSize > 20480 {
+			break
+		}
+
+		result = append(result, chosen)
 	}
 
 	for _, item := range result {
 		delete(dirMap, item)
 	}
 
-	fmt.Println("Chosen files: ", result)
+	fmt.Printf("Chosen files: %s. Total size: %d.\n", result, totalSize)
 
 	return result
 }

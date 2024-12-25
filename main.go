@@ -69,6 +69,10 @@ func main() {
 		http.ServeFile(w, r, "."+r.URL.Path)
 	})
 
+	mux.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "."+r.URL.Path)
+	})
+
 	server := &http.Server{
 		Addr:    ":3333",
 		Handler: mux,

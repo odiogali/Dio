@@ -15,32 +15,37 @@ import (
 
 var (
 	dirMap             = make(map[string][]string) // Maps directory name to names of files that haven't been chosen
+	ImgDir      string = ""
 	webContent  string = ""
 	contentLock sync.RWMutex
 )
 
 func main() {
 	// Command-line argument error handling
-	if len(os.Args) <= 2 {
-		fmt.Println("Must include at least one directory path to choose from.")
+	if len(os.Args) <= 3 {
+		fmt.Println("Must include at least one directory path to choose from as well as an image directory path.")
 		os.Exit(1)
 	}
 
-	fmt.Printf("Your arguments: %s\n\n", os.Args[1:])
-
-	// Add the specified directories into the map with empty lists as their values
-	for _, s := range os.Args[1:] {
+	// Add the specified directories into the map with empty lists as their values (don't include last item)
+	for _, s := range os.Args[1 : len(os.Args)-1] {
 		dirMap[s] = []string{}
 	}
 
+	ImgDir = os.Args[len(os.Args)-1]
+
+	fmt.Printf("Directory arguments: %s\n", dirMap)
+	fmt.Printf("Image directory: %s\n\n", ImgDir)
+
 	// Concurrent goroutine for updating webpage dynamically
 	go func() {
-		ticker := time.NewTicker(15 * time.Second)
+		ticker := time.NewTicker(5 * time.Minute)
 		defer ticker.Stop()
 
+		fmt.Println("\nSelecting new files...")
 		updateContent()
 		for range ticker.C {
-			fmt.Println("Selecting new files...")
+			fmt.Println("\nSelecting new files...")
 			updateContent()
 		}
 	}()
@@ -57,6 +62,12 @@ func main() {
 	}
 
 	mux.HandleFunc("/", getRoot)
+
+	mux.HandleFunc("/output/images/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Requested file: ", r.URL.Path)
+
+		http.ServeFile(w, r, "."+r.URL.Path)
+	})
 
 	server := &http.Server{
 		Addr:    ":3333",
@@ -79,7 +90,12 @@ func updateContent() {
 		}
 	}
 
-	message := mdToHTML(smartSelect(dirMap))
+	selectedFiles := smartSelect(dirMap)
+
+	copiedFiles := copyFile(selectedFiles)
+	_ = copyImages(copiedFiles)
+
+	message := mdToHTML(copiedFiles)
 
 	contentLock.Lock()
 	webContent = string(message)
@@ -132,7 +148,7 @@ func smartSelect(dirMap map[string][]string) []string {
 		totalSize += info.Size()
 
 		// If the totalSize of the files we wish to add is larger than 20 kB, don't add the additional file
-		if len(result) > 1 && totalSize > 20480 {
+		if len(result) > 1 && totalSize > 20480 { // Maybe change to >= 1
 			totalSize -= info.Size()
 			break
 		}

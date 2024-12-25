@@ -19,3 +19,19 @@ func TestRepopulate(t *testing.T) {
 		t.Fatalf("Expected: %s, Actual: %s", expected, actual)
 	}
 }
+
+func TestSmartSelect(t *testing.T) {
+	expected := "smart select"
+	actual := "smart selected"
+	if expected != actual {
+		t.Fatalf("Expected: %s, Actual: %s", expected, actual)
+	}
+}
+
+func TestChooseFile(t *testing.T) {
+	expected := "choose file"
+	actual := "choosen file"
+	if expected != actual {
+		t.Fatalf("Expected: %s, Actual: %s", expected, actual)
+	}
+}

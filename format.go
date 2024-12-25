@@ -13,6 +13,7 @@ import (
 	"fmt"
 )
 
+// Read all specifed MD files in files and render as one entire HTML file
 func mdToHTML(files []string) []byte {
 	// read and store markdown file in 'mdContent'
 	var contents []byte
@@ -40,6 +41,7 @@ func mdToHTML(files []string) []byte {
 	return markdown.Render(doc, renderer)
 }
 
+// Read contents of a file specified in selectedFiles, and copy it into cwd
 func copyFile(selectedFiles []string) []string {
 	var copiedFiles []string
 
@@ -84,6 +86,7 @@ func copyFile(selectedFiles []string) []string {
 	return copiedFiles
 }
 
+// Read contents of a image file specified in selectedFiles, and copy it into cwd
 func copyImages(selectedFiles []string) []string {
 	var copiedImages []string
 
@@ -123,6 +126,7 @@ func copyImages(selectedFiles []string) []string {
 	return copiedImages
 }
 
+// Use regex to extract names of images from a file and replace them with the new location of the image file
 func extractPhotos(fileName string) []string {
 	var allPhotos []string
 

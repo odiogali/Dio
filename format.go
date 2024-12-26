@@ -60,12 +60,10 @@ func mdToHTML(files []string) []byte {
 		os.Exit(420)
 	}
 	htmlContent := string(contents)
-	re := regexp.MustCompile(`<span class="math inline">(.+?)</span>`)
-	updatedContent := re.ReplaceAllString(htmlContent, `$$1$`)
 
-	os.WriteFile("final.html", []byte(updatedContent), 0777)
+	os.WriteFile("final.html", []byte(htmlContent), 0777)
 
-	return []byte(updatedContent)
+	return []byte(htmlContent)
 }
 
 // Read contents of a file specified in selectedFiles, and copy it into cwd
@@ -100,7 +98,7 @@ func copyFile(selectedFiles []string) []string {
 			os.Exit(3)
 		}
 
-		_, err = dst.WriteString("\n")
+		_, err = dst.WriteString("\n\n\n\n")
 		if err != nil {
 			fmt.Printf("Failed to write newline to the file: '%s'.\n", fileName)
 			os.Exit(4)

@@ -1,0 +1,176 @@
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f111a;
+    color: #e4e6eb;
+    width: 40%;
+    margin: 0 auto;
+    justify-content: center; /* Horizontally center */
+    align-items: center; /* Vertically center */   
+    padding: 70;
+    line-height: 1.6;
+}
+
+img {
+    max-width: 100%; /* Image fits within the width of the container */
+    max-height: 100%; /* Image fits within the height of the container */
+    display: block;   /* Removes inline spacing around images */
+    margin: 0 auto;   /* Centers the image horizontally */
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    background-color: #161b22;
+    width: 250px;
+    height: 100vh;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1rem;
+    border-right: 1px solid #1f242d;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 1rem;
+}
+
+.sidebar a {
+    color: #b0b3b8;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sidebar a:hover {
+    color: #f39c12;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 270px;
+    padding: 2rem;
+    max-width: 800px;
+}
+
+h1 {
+    color: #ff757e;
+    font-size: 32px;
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    color: #e0af68;
+    font-size: 24px;
+    margin-bottom: 0.5rem;
+}
+
+h3 {
+    color: #9ece6a;
+    font-size: 18px;
+    margin-bottom: 0.5rem;
+}
+
+h4 {
+    color: #7dcfff;
+    font-size: 32px;
+    margin-bottom: 0.5rem;
+}
+
+h5 {
+    color: #7aa2f7;
+    font-size: 24px;
+    margin-bottom: 0.5rem;
+}
+
+h6 {
+    color: #bb9af7;
+    font-size: 18px;
+    margin-bottom: 0.5rem;
+}
+
+/* Question Section */
+.question {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #1a1d27;
+    border-radius: 8px;
+}
+
+/* Example Blocks */
+.example {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #161b22;
+    border-left: 4px solid #f39c12;
+    border-radius: 8px;
+}
+
+.example pre {
+    background-color: #1e222d;
+    padding: 1rem;
+    border-radius: 8px;
+    color: #abb2bf;
+    font-size: 14px;
+    overflow-x: auto;
+}
+
+/* Links */
+a {
+    color: #4f8cff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Code Styling */
+code {
+    font-family: 'Fira Code', monospace;
+    background-color: #1e222d;
+    color: #c3e88d;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 90%;
+}
+
+pre {
+    background-color: #1e222d;
+    color: #abb2bf;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+}
+
+/* Collapsible Menus */
+details {
+    margin-bottom: 1rem;
+    background-color: #161b22;
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+details summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #e4e6eb;
+}
+
+details[open] summary {
+    color: #f39c12;
+}
+
+/* Highlighted Sections */
+.highlight {
+    background-color: #262d3a;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}

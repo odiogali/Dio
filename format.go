@@ -36,9 +36,36 @@ func mdToHTML(files []string) []byte {
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
 
-	os.WriteFile("final.html", markdown.Render(doc, renderer), 0777)
+	os.WriteFile("final.html", []byte(fmt.Sprintf(`<!DOCTYPE html>
+<html lang="en">
 
-	return markdown.Render(doc, renderer)
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Go Smart Reviewer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
+	%s
+</body>
+
+</html>`, markdown.Render(doc, renderer))), 0777)
+
+	// Read final.html and replace all '<span class="math inline">...</span>' with $$...$$
+	contents, err := os.ReadFile("final.html")
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		os.Exit(420)
+	}
+	htmlContent := string(contents)
+	re := regexp.MustCompile(`<span class="math inline">(.+?)</span>`)
+	updatedContent := re.ReplaceAllString(htmlContent, `$$$1$$`)
+
+	os.WriteFile("final.html", []byte(updatedContent), 0777)
+
+	return []byte(updatedContent)
 }
 
 // Read contents of a file specified in selectedFiles, and copy it into cwd

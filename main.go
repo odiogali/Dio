@@ -53,15 +53,13 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Handle requests to get the root
-	var getRoot = func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Got / request")
 		contentLock.RLock()
 		w.Header().Set("Content-Type", "text/html")
 		io.WriteString(w, webContent)
 		contentLock.RUnlock()
-	}
-
-	mux.HandleFunc("/", getRoot)
+	})
 
 	mux.HandleFunc("/output/images/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Requested file: ", r.URL.Path)
@@ -70,6 +68,16 @@ func main() {
 	})
 
 	mux.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Got css request")
+
+		w.Header().Set("Content-Type", "text/css")
+		http.ServeFile(w, r, "."+r.URL.Path)
+	})
+
+	mux.HandleFunc("/index.js", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Got index.js request")
+
+		w.Header().Set("Content-Type", "text/javascript")
 		http.ServeFile(w, r, "."+r.URL.Path)
 	})
 

@@ -47,13 +47,13 @@ func mdToHTML(files []string) []byte {
 </head>
 
 <body>
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 	%s
 </body>
 
 </html>`, markdown.Render(doc, renderer))), 0777)
 
-	// Read final.html and replace all '<span class="math inline">...</span>' with $$...$$
+	// Read final.html and replace all '<span class="math inline">...</span>' with $...$
 	contents, err := os.ReadFile("final.html")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
@@ -61,7 +61,7 @@ func mdToHTML(files []string) []byte {
 	}
 	htmlContent := string(contents)
 	re := regexp.MustCompile(`<span class="math inline">(.+?)</span>`)
-	updatedContent := re.ReplaceAllString(htmlContent, `$$$1$$`)
+	updatedContent := re.ReplaceAllString(htmlContent, `$$1$`)
 
 	os.WriteFile("final.html", []byte(updatedContent), 0777)
 

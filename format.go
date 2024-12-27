@@ -17,6 +17,8 @@ import (
 func mdToHTML(files []string) []byte {
 	// read and store markdown file in 'mdContent'
 	var contents []byte
+
+	// Read each file and concatenate them all together to form a large file
 	for i := range files {
 		readData, err := os.ReadFile("output/" + files[i])
 		if err != nil {
@@ -31,46 +33,40 @@ func mdToHTML(files []string) []byte {
 	p := parser.NewWithExtensions(extensions)
 	doc := p.Parse(contents)
 
-	// Create a html renderer and from the parsed markdown, render html
+	// Create a html renderer
 	htmlFlags := html.CommonFlags | html.HrefTargetBlank
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
 
-	os.WriteFile("final.html", []byte(fmt.Sprintf(`<!DOCTYPE html>
-<html lang="en">
+	// Take the parsed MD and turn it to HTML, surrounding it with the below boilerplate,
+	// loading the Mathjax parser for Latex equations, and 'style.css' for mild styling
+	res := fmt.Sprintf(`<!DOCTYPE html>
+	<html lang="en">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Go Smart Reviewer</title>
-  <link rel="stylesheet" href="/style.css">
-</head>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Go Smart Reviewer</title>
+		<link rel="stylesheet" href="/style.css">
+	</head>
 
-<body>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-	%s
-</body>
+	<body>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+		%s
+	</body>
 
-</html>`, markdown.Render(doc, renderer))), 0777)
+	</html>`, markdown.Render(doc, renderer))
 
-	// Read final.html and replace all '<span class="math inline">...</span>' with $...$
-	contents, err := os.ReadFile("final.html")
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		os.Exit(420)
-	}
-	htmlContent := string(contents)
-
-	os.WriteFile("final.html", []byte(htmlContent), 0777)
-
-	return []byte(htmlContent)
+	// Write content to final.html for debug / visibility purposes
+	os.WriteFile("final.html", []byte(res), 0777)
+	return []byte(res)
 }
 
 // Read contents of a file specified in selectedFiles, and copy it into cwd
 func copyFile(selectedFiles []string) []string {
 	var copiedFiles []string
 
-	// Copy the files selected by smartSelect
+	// Copy the files pre-selected files
 	for _, fullPathName := range selectedFiles {
 		splitted := strings.Split(fullPathName, "/")
 		fileName := splitted[len(splitted)-1]
@@ -80,10 +76,9 @@ func copyFile(selectedFiles []string) []string {
 		if err != nil {
 			fmt.Printf("Error opening the file: %s\n", fullPathName)
 			os.Exit(1)
-
 		}
 		defer src.Close()
-		// Create file the copy of the original will be stored in
+		// Create file that will hold the original's contents
 		dst, err := os.Create("output/" + fileName)
 		if err != nil {
 			fmt.Printf("Failed to create destination file: %s due to %v\n", fileName, err)
@@ -98,37 +93,39 @@ func copyFile(selectedFiles []string) []string {
 			os.Exit(3)
 		}
 
+		// Add newlines to the end of every copied file (to easily visually distinguish the files)
 		_, err = dst.WriteString("\n\n\n\n")
 		if err != nil {
 			fmt.Printf("Failed to write newline to the file: '%s'.\n", fileName)
 			os.Exit(4)
 		}
 
+		// Keep a record of the files that were copied
 		copiedFiles = append(copiedFiles, fileName)
-		fmt.Printf("Copy of %s created successfully!\n", fileName)
+		fmt.Println("Successfully copied: ", fileName)
 	}
 
+	//fmt.Println("Copied files: ", copiedFiles)
 	return copiedFiles
 }
 
-// Read contents of a image file specified in selectedFiles, and copy it into cwd
+// Go through list of files, and copy all images in each file
 func copyImages(selectedFiles []string) []string {
 	var copiedImages []string
 
 	for _, fileName := range selectedFiles {
 		extracted := extractPhotos(fileName)
 		copiedImages = append(copiedImages, extracted...)
+		fmt.Println("Extracted: ", extracted)
 
-		fmt.Printf("Extracted: ")
-		fmt.Println(extracted)
 		for _, photoName := range extracted {
-			// Open image for reading
+			// Open image file for reading
 			src, err := os.Open(ImgDir + "/" + photoName)
 			if err != nil {
 				fmt.Printf("Error opening the file: %s, due to error: %v\n", photoName, err)
 			}
 			defer src.Close()
-			// Create file the copy of the original will be stored in
+			// Create image file that will hold the copy of the original image's contents
 			dst, err := os.Create("output/images/" + photoName)
 			if err != nil {
 				fmt.Printf("Failed to create image file: %s due to %v\n", photoName, err)
@@ -146,8 +143,7 @@ func copyImages(selectedFiles []string) []string {
 		}
 	}
 
-	fmt.Printf("Copied Images: %s\n\n", copiedImages)
-
+	//fmt.Printf("Copied Images: %s\n\n", copiedImages)
 	return copiedImages
 }
 

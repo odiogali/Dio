@@ -14,11 +14,49 @@ html, body {
 }
 
 .content {
+    font-family: 'Inter', sans-serif;
     max-width: 800px; /* Restrict content width */
     margin: 20px; /* Add spacing around the content */
     padding: 20px; /* Add inner padding */
     overflow: hidden; /* Ensure content doesn't overflow the container */
     color: #fff;
+}
+
+/*
+table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+*/
+
+table {
+    width: 100%; /* Makes the table responsive */
+    border-collapse: collapse; /* Ensures borders don't double up */
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    color: #fff; /* White text color */
+    border: 1px solid #2d2d2d; /* Border for the table */
+}
+
+th, td {
+    padding: 12px 15px; /* Adds space inside cells */
+    border: 1px solid #2d2d2d; /* Borders for table cells */
+}
+
+th {
+    background-color: #1e1e2e; /* Slightly darker background for the header */
+    color: #f2f2f2; /* Light text for the header */
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #333333; /* Highlight row on hover */
+    transition: background-color 0.3s ease; /* Smooth transition effect */
 }
 
 img {

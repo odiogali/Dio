@@ -44,13 +44,15 @@ func main() {
 	// Concurrent goroutine for updating webpage dynamically
 	go func() {
 		// WARNING: Should be changed to 24 hours after testing is complete
-		ticker := time.NewTicker(5 * time.Minute)
+		ticker := time.NewTicker(30 * time.Second)
 		defer ticker.Stop()
 
 		fmt.Println("\nSelecting new files...")
+		cleanRepo()
 		updateContent()
 		for range ticker.C {
 			fmt.Println("\nSelecting new files...")
+			cleanRepo()
 			updateContent()
 		}
 	}()
@@ -239,4 +241,18 @@ func sendEmail() {
 	}
 
 	fmt.Println("Email sent successfully!")
+}
+
+func cleanRepo() {
+	err := os.RemoveAll("output")
+	if err != nil {
+		fmt.Println("Unable to clean the current working directory.")
+		os.Exit(69)
+	}
+
+	err = os.MkdirAll("output/images", 0777)
+	if err != nil {
+		fmt.Println("Unable to clean the current working directory.")
+		os.Exit(420)
+	}
 }

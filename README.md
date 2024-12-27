@@ -1,8 +1,10 @@
-# Smart Review
-Smart Review is a project that seeks to automate the process of deciding what to review. It deals with:
+# Dio
+Dio is a project that seeks to automate the process of deciding what to review. It deals with:
 - Deciding what note to review based on what you've reviewed in the current cycle
 - Formatting the notes such that they can be viewed as they are in your markdown editor
 - Sending an email notification informing you that you need to review your notes as well as the IP and port which the server is on
+
+<u>Pre-requisite</u>: Because it takes your markdown notes and turns it into HTML which is rendered on the web, you need to have markdown notes. I recommend using Obsidian due to the plugins it contains, its customizability, and its various features, but other markdown editors exist I'm sure.
 
 # How to Use It
 1. Run this command in your terminal `git clone https://github.com/odiogali/goSmartReviewer.git`

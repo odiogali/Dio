@@ -1,14 +1,24 @@
 /* Base Styles */
-body {
-    font-family: 'Inter', sans-serif;
+html {
+  background-attachment: fixed;
+}
+
+html, body {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
     background-color: #0f111a;
-    color: #e4e6eb;
-    width: 40%;
-    margin: 0 auto;
-    justify-content: center; /* Horizontally center */
-    align-items: center; /* Vertically center */   
-    padding: 70;
-    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.content {
+    max-width: 800px; /* Restrict content width */
+    margin: 20px; /* Add spacing around the content */
+    padding: 20px; /* Add inner padding */
+    overflow: hidden; /* Ensure content doesn't overflow the container */
+    color: #fff;
 }
 
 img {

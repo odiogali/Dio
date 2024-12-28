@@ -110,7 +110,7 @@ func updateContent() {
 
 	contentLock.Lock()
 	webContent = string(message) // Write HTML file to webContent
-	//sendEmail()                  // Send notification email with 'Time to Review' message
+	sendEmail()                  // Send notification email with 'Time to Review' message
 	contentLock.Unlock()
 }
 

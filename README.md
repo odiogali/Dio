@@ -1,5 +1,5 @@
 # Dio
-Dio is a project that seeks to automate the process of deciding what to review. It deals with:
+Dio, short for Diogenes is a project that seeks to automate the process of deciding what to review. It deals with:
 - Deciding what note to review based on what you've reviewed in the current cycle
 - Formatting the notes such that they can be viewed as they are in your markdown editor
 - Sending an email notification informing you that you need to review your notes as well as the IP and port which the server is on

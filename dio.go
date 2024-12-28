@@ -22,7 +22,7 @@ import (
 
 var (
 	dirMap             = make(map[string][]string) // Maps directory name to names of files that haven't been chosen
-	ImgDir      string = ""
+	imgDir      string = ""
 	webContent  string = ""
 	contentLock sync.RWMutex
 	PORT        string = ":3333"
@@ -41,10 +41,10 @@ func main() {
 		dirMap[s] = []string{}
 	}
 	// Final argument - which should be directory path - is the image directory
-	ImgDir = os.Args[len(os.Args)-1]
+	imgDir = os.Args[len(os.Args)-1]
 	// Ensure that user is aware of the above stipulations
 	fmt.Printf("Directory arguments: %s\n", dirMap)
-	fmt.Printf("Image directory: %s\n\n", ImgDir)
+	fmt.Printf("Image directory: %s\n\n", imgDir)
 
 	// Concurrent goroutine for updating webpage dynamically
 	go func() {
@@ -345,7 +345,7 @@ func copyImages(selectedFiles []string) []string {
 
 		for _, photoName := range extracted {
 			// Open image file for reading
-			src, err := os.Open(ImgDir + "/" + photoName)
+			src, err := os.Open(imgDir + "/" + photoName)
 			if err != nil {
 				fmt.Println(fmt.Errorf("Error occured: %v\n", err))
 			}

@@ -48,8 +48,7 @@ func main() {
 
 	// Concurrent goroutine for updating webpage dynamically
 	go func() {
-		// WARNING: Should be changed to 24 hours after testing is complete
-		ticker := time.NewTicker(5 * time.Second)
+		ticker := time.NewTicker(24 * time.Hour)
 		defer ticker.Stop()
 
 		fmt.Println("\nSelecting new files...")

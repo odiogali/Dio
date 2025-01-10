@@ -30,7 +30,7 @@ var (
 
 func main() {
 	// Command-line argument error handling
-	if len(os.Args) <= 3 {
+	if len(os.Args) <= 2 {
 		fmt.Println("Must include at least one directory path to choose from as well as an image directory path.")
 		os.Exit(1)
 	}
@@ -160,7 +160,7 @@ func smartSelect() []string {
 		totalSize += info.Size()
 
 		// If the totalSize of the files we wish to add is larger than 20 kB, don't add the additional file
-		if len(result) > 1 && totalSize > 20480 {
+		if len(result) >= 1 && totalSize > 20480 {
 			totalSize -= info.Size()
 			break
 		}
@@ -271,6 +271,7 @@ func mdToHTML(files []string) []byte {
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Dio: Greatness in the Mundane</title>
 		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 	</head>
 
 	<body>
@@ -278,6 +279,14 @@ func mdToHTML(files []string) []byte {
 		<div class="content">
 		%s
 		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/armasm.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/glsl.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+		<script>hljs.highlightAll();</script>
 	</body>
 
 	</html>`, markdown.Render(doc, renderer))

@@ -1,3 +1,3 @@
 while true; do 
-  _build/Dio
+  build/Dio
 done
